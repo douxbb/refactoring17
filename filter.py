@@ -3,10 +3,12 @@ from PIL import Image
 
 
 class PixelArt:
-    def __init__(self, chunk_size, color_step):
+    def __init__(self, chunk_size, color_step, file_path, save_path):
+        self.save_path = save_path
+        self.file_path = file_path
         self.chunk_size = chunk_size
         self.color_step = color_step
-        image = Image.open("img2.jpg")
+        image = Image.open(file_path)
         self.array = np.array(image)
         self.result = np.array(image)
         self.x_len = len(self.array)
@@ -29,10 +31,13 @@ class PixelArt:
 
     def save(self):
         result = Image.fromarray(self.result)
-        result.save('res.jpg')
+        result.save(self.save_path)
 
 
 if __name__ == '__main__':
-    art = PixelArt(int(input('Enter chunk size: ')), 255 // int(input('Enter count of colors: ')))
+    art = PixelArt(int(input('Enter chunk size: ')),
+                   255 // int(input('Enter count of colors: ')),
+                   input('Enter original file path: '),
+                   input('Enter result file path: '))
     art.generate_art()
     art.save()

@@ -2,19 +2,23 @@ from PIL import Image
 import numpy as np
 img = Image.open("img2.jpg")
 arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
+width = len(arr)
+height = len(arr[1])
 i = 0
-while i < a:
+while i < width:
     j = 0
-    while j < a1:
+    while j < height:
         s = 0
         for n in range(i, i + 10):
+            if n >= width:
+                break
             for n1 in range(j, j + 10):
-                r1 = int(arr[n][n1][0])
-                r2 = int(arr[n][n1][1])
-                r3 = int(arr[n][n1][2])
-                M = int(r1 + r2 + r3) // 3
+                if n1 >= height:
+                    break
+                r = int(arr[n][n1][0])
+                g = int(arr[n][n1][1])
+                b = int(arr[n][n1][2])
+                M = int(r + g + b) // 3
                 s += M
         s = int(s // 100)
         for n in range(i, i + 10):

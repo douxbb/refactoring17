@@ -1,34 +1,31 @@
-from PIL import Image
-
 import numpy as np
+from PIL import Image
 
 
 class PixelArt:
     def __init__(self, chunk_size, color_step):
         self.chunk_size = chunk_size
         self.color_step = color_step
-        self.result = None
+        image = Image.open("img2.jpg")
+        self.array = np.array(image)
+        self.result = np.array(image)
+        self.x_len = len(self.array)
+        self.y_len = len(self.array[1])
 
     def generate_art(self):
-        image = Image.open("img2.jpg")
-        array = np.array(image)
-        self.result = np.array(image)
-        x_len = len(array)
-        y_len = len(array[1])
-        x = 0
-        while x < x_len:
-            y = 0
-            while y < y_len:
-                chunk_color = 0
-                for n in range(x, x + (self.chunk_size if x_len - x >= self.chunk_size else x_len - x)):
-                    for n1 in range(y, y + (self.chunk_size if y_len - y >= self.chunk_size else y_len - y)):
-                        chunk_color += sum(map(int, array[n][n1])) / 3
-                chunk_color = int(chunk_color // 100)
-                for n in range(x, x + (self.chunk_size if x_len - x >= self.chunk_size else x_len - x)):
-                    for n1 in range(y, y + (self.chunk_size if y_len - y >= self.chunk_size else y_len - y)):
-                        self.result[n][n1] = [(chunk_color // self.color_step) * self.color_step for _ in range(3)]
-                y += self.chunk_size
-            x += self.chunk_size
+        for x in range(0, self.x_len, self.chunk_size):
+            for y in range(0, self.y_len, self.chunk_size):
+                chunk_color = [(int(sum([sum([sum(map(int, self.array[n][n1])) / 3
+                                              for n1 in range(y, y + (self.chunk_size
+                                                                      if self.y_len - y >= self.chunk_size
+                                                                      else self.y_len - y))])
+                                         for n in range(x, x + (self.chunk_size
+                                                                if self.x_len - x >= self.chunk_size
+                                                                else self.x_len - x))]) // 100) // self.color_step)
+                               * self.color_step for _ in range(3)]
+                for m in range(x, x + (self.chunk_size if self.x_len - x >= self.chunk_size else self.x_len - x)):
+                    for m1 in range(y, y + (self.chunk_size if self.y_len - y >= self.chunk_size else self.y_len - y)):
+                        self.result[m][m1] = chunk_color
 
     def save(self):
         result = Image.fromarray(self.result)

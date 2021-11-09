@@ -1,28 +1,36 @@
 from PIL import Image
 import numpy as np
+
+def get_image_brightness(rows, columns, img_array, mosaic_size) -> int:
+    return sum((int(img_array[r_index][c_index][0]) 
+            + int(img_array[r_index][c_index][1]) 
+            + int(img_array[r_index][c_index][2])) // 3 
+            for c_index in range(columns, columns + mosaic_size) 
+            for r_index in range(rows, rows + mosaic_size))
+
+def create_grayscale_img_bit(rows, columns, mosaic_size, brightness) -> None:
+    for r_index in range(rows, rows + mosaic_size):
+            for c_index in range(columns, columns + mosaic_size):
+                img_array[r_index][c_index] = np.full(3, brightness)
+
 img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr) 
-a1 = len(arr[1])
-i = 0
-while i < a:
-    j = 0
-    while j < a1:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                r = arr[n][n1][0] 
-                g = arr[n][n1][1]
-                b = arr[n][n1][2]  
-                M = (int(r) + int(g) + int(b)) // 3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50 
-                arr[n][n1][1] = int(s // 50) * 50 
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+img_array = np.array(img)
+rows_length = len(img_array) 
+columns_length = len(img_array[0])
+mosaic_size = 10
+grayscale = 50
+
+rows = 0
+while rows < rows_length:
+    columns = 0
+    while columns < columns_length:
+        create_grayscale_img_bit(rows, 
+                                columns, 
+                                mosaic_size, 
+                                get_image_brightness(rows, 
+                                                    columns, 
+                                                    img_array, 
+                                                    mosaic_size) // mosaic_size**2 // grayscale*grayscale)
+        columns += mosaic_size
+    rows += mosaic_size
+Image.fromarray(img_array).save('res.jpg')

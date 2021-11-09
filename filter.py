@@ -8,29 +8,26 @@ def get_image_brightness(rows, columns, img_array, mosaic_size) -> int:
             for c_index in range(columns, columns + mosaic_size) 
             for r_index in range(rows, rows + mosaic_size))
 
-def create_grayscale_img_bit(rows, columns, mosaic_size, brightness) -> None:
+def create_img_bit(rows, columns, mosaic_size, brightness, img_array) -> None:
     for r_index in range(rows, rows + mosaic_size):
-            for c_index in range(columns, columns + mosaic_size):
-                img_array[r_index][c_index] = np.full(3, brightness)
+        for c_index in range(columns, columns + mosaic_size):
+            img_array[r_index][c_index] = np.full(3, brightness)
+    return img_array
 
-img = Image.open("img2.jpg")
-img_array = np.array(img)
-rows_length = len(img_array) 
-columns_length = len(img_array[0])
-mosaic_size = 10
-grayscale = 50
+def create_image(img_array, rows_length, columns_length, mosaic_size, grayscale):
+    rows = 0
+    while rows < rows_length:
+        columns = 0
+        while columns < columns_length:
+            create_img_bit(rows, columns, mosaic_size, get_image_brightness(rows, columns, img_array, mosaic_size) // mosaic_size**2 // grayscale*grayscale,
+                        img_array)
+            columns += mosaic_size
+        rows += mosaic_size
+    return img_array
 
-rows = 0
-while rows < rows_length:
-    columns = 0
-    while columns < columns_length:
-        create_grayscale_img_bit(rows, 
-                                columns, 
-                                mosaic_size, 
-                                get_image_brightness(rows, 
-                                                    columns, 
-                                                    img_array, 
-                                                    mosaic_size) // mosaic_size**2 // grayscale*grayscale)
-        columns += mosaic_size
-    rows += mosaic_size
-Image.fromarray(img_array).save('res.jpg')
+img_array = np.array(Image.open(input('Введите имя изображения в директории: ') + ".jpg"))
+Image.fromarray(create_image(img_array, 
+            len(img_array), 
+            len(img_array[0]), 
+            int(input('Введите размер мозаики: ')), 
+            int(input('Введите шаг оттенка: ')))).save('res.jpg')

@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import sys
 
 
 def get_mosaic_image(image, mosaic_size=10, gradation=4):
@@ -19,6 +20,7 @@ def get_mosaic_image(image, mosaic_size=10, gradation=4):
         i += mosaic_size
     return Image.fromarray(np.uint8(image_tensor))
 
+
 def set_color(new_color, tensor, mosaic_size, i, j):
     for sector_i in range(i, i + mosaic_size):
         for sector_j in range(j, j + mosaic_size):
@@ -26,6 +28,10 @@ def set_color(new_color, tensor, mosaic_size, i, j):
                 tensor[sector_i][sector_j][c] = new_color
 
 
-source_img = Image.open("img2.jpg")
-res = get_mosaic_image(source_img, mosaic_size=15, gradation=5)
-res.save('res.jpg')
+if __name__ == "__main__":
+    source_name = sys.argv[1]
+    output_name = sys.argv[2]
+
+    source_img = Image.open(source_name)
+    image_tensor = np.array(source_img).astype(int)
+    get_mosaic_image(image_tensor, mosaic_size=10, gradation=5).save(output_name)

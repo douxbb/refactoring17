@@ -1,32 +1,33 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-#обрезает лишнее кол-во пикселей
-while len(arr) % 10 != 0: arr = np.delete(arr, len(arr) // 10 * 10, 0)
-while len(arr[0]) % 10 != 0: arr = np.delete(arr, len(arr[0]) // 10 * 10, 1)
-#
-a = len(arr)
-a1 = len(arr[0])
-i = 0
-while i < a - 9:
-    j = 0
-    while j < a1 - 9:
-        s = 0
-        for r_index in range(i, i + 10):
-            for c_index in range(j, j + 10):
-                r = arr[r_index][c_index][0]
-                g = arr[r_index][c_index][1]
-                b = arr[r_index][c_index][2]
-                M = int(r) + int(g) + int(b)
-                s += M
-        s = s // 100
-        for r_index in range(i, i + 10):
-            for c_index in range(j, j + 10):
-                arr[r_index][c_index][0] = s // 50 * 50 // 3
-                arr[r_index][c_index][1] = s // 50 * 50 // 3
-                arr[r_index][c_index][2] = s // 50 * 50 // 3
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+def open_and_crop(file_name:str, cells_size:int) -> np.ndarray:
+    pix_array = np.array(Image.open(file_name))
+    rows, columns = len(pix_array), len(pix_array[0])
+    pix_array = np.delete(pix_array, slice(rows // cells_size * cells_size - 1, rows - 1), 0)
+    pix_array = np.delete(pix_array, slice(columns // cells_size * cells_size - 1, columns - 1), 1)
+    return pix_array
+
+def convert_to_mozaic(pixels_array:np.ndarray, cell_size:int, step_size:int):
+    rows_amount = len(pixels_array)
+    columns_amount = len(pixels_array[0])
+    row_index = 0
+    while row_index < rows_amount - (cell_size - 1):
+        column_index = 0
+        while column_index < columns_amount - (cell_size - 1):
+            hue = 0
+            for r_index in range(row_index, row_index + cell_size):
+                for c_index in range(column_index, column_index + cell_size):
+                    hue += (int(pixels_array[r_index][c_index][0]) 
+                            + int(pixels_array[r_index][c_index][1]) 
+                            + int(pixels_array[r_index][c_index][2])) // 3
+            hue = hue // cell_size ** 2 // step_size * step_size
+            for r_index in range(row_index, row_index + cell_size):
+                for c_index in range(column_index, column_index + cell_size):
+                    pixels_array[r_index][c_index] = np.full(3, hue)
+            column_index += cell_size
+        row_index += cell_size
+    return pixels_array
+cell = 10
+step = 50
+Image.fromarray(convert_to_mozaic(open_and_crop("img2.jpg", cell), cell, step)).save('res.jpg')

@@ -16,14 +16,12 @@ def convert_to_mozaic(pixels_array:np.ndarray, cell_size:int, step_size:int):
         column_index = 0
         while column_index < columns_amount - (cell_size - 1):
             hue = 0
-            for r_index in range(row_index, row_index + cell_size):
-                for c_index in range(column_index, column_index + cell_size):
+            for r_index, c_index in np.ndindex(pixels_array.shape):
                     hue += (int(pixels_array[r_index][c_index][0]) 
                             + int(pixels_array[r_index][c_index][1]) 
                             + int(pixels_array[r_index][c_index][2])) // 3
             hue = hue // cell_size ** 2 // step_size * step_size
-            for r_index in range(row_index, row_index + cell_size):
-                for c_index in range(column_index, column_index + cell_size):
+            for r_index, c_index in np.ndindex(pixels_array.shape):
                     pixels_array[r_index][c_index] = np.full(3, hue)
             column_index += cell_size
         row_index += cell_size

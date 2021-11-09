@@ -5,20 +5,20 @@ arr = np.array(img)
 a = len(arr)
 a1 = len(arr[1])
 i = 0
-while i < a - 11:
+while i < a:
     j = 0
-    while j < a1 - 11:
+    while j < a1:
         s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
+        for n in range(i, i + (10 if a - i >= 10 else a - i)):
+            for n1 in range(j, j + (10 if a1 - j >= 10 else a1 - j)):
+                r = arr[n][n1][0]
+                g = arr[n][n1][1]
+                b = arr[n][n1][2]
+                M = (int(r) + int(g) + int(b)) / 3
                 s += M
         s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
+        for n in range(i, i + (10 if a - i >= 10 else a - i)):
+            for n1 in range(j, j + (10 if a1 - j >= 10 else a1 - j)):
                 arr[n][n1][0] = int(s // 50) * 50
                 arr[n][n1][1] = int(s // 50) * 50
                 arr[n][n1][2] = int(s // 50) * 50

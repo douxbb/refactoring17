@@ -17,8 +17,8 @@ def pixelation(pixels, step, pixel_size):
             refactor_pixels(pixels, i, j, step, pixel_size)
     return pixels
 
-img = Image.open("img2.jpg")
+img = Image.open(input('Имя входной фотографии: '))
 pixels = np.array(img)
-res = Image.fromarray(pixelation(pixels, 50, 20))
-res.save('res.jpg')
+res = Image.fromarray(pixelation(pixels, int(input("Глубина цвета: ")), int(input("Размер мозаики: "))))
+res.save(input('Имя обработарнной фотографии: '))
 

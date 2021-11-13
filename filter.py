@@ -1,28 +1,24 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+
+def refactor_pixels(pixels, i, j, step, pixel_size):
+    middle_brightness = int(int(np.sum(pixels[i:i + pixel_size, j:j + pixel_size])) // 3 // (pixel_size ** 2))
+    pixels[i: i + pixel_size, j: j + pixel_size] = int(middle_brightness // step) * step
+
+def pixelation(pixels, step, pixel_size):
+    width = len(pixels)
+    height = len(pixels[1])
+    pixels = pixels[:width // pixel_size * pixel_size, :height // pixel_size * pixel_size]
+    width = len(pixels)
+    height = len(pixels[1])
+    for i in range(0, width - pixel_size + 1, pixel_size):
+        for j in range(0, height - pixel_size + 1, pixel_size):
+            refactor_pixels(pixels, i, j, step, pixel_size)
+    return pixels
+
+img = Image.open(input('Имя входной фотографии: '))
+pixels = np.array(img)
+res = Image.fromarray(pixelation(pixels, int(input("Глубина цвета: ")), int(input("Размер мозаики: "))))
+res.save(input('Имя обработарнной фотографии: '))
+

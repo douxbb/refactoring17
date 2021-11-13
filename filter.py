@@ -1,28 +1,43 @@
 from PIL import Image
 import numpy as np
+
+
+def get_mosaic(image, size, gradation):
+    limit = 255 // gradation
+    image_arr = np.array(image).astype(int)
+    image_len = len(image_arr)
+    image_h = len(image_arr[0])
+    i = 0
+    while i < image_len:
+        j = 0
+        while j < image_h:
+            sum_c = get_sum(image_arr, size, i, j)
+            avg = int(sum_c // (size ** 2))
+            set_color(int(avg // limit) * limit / 3, image_arr, size, i, j)
+            j += size
+        i += size
+    return Image.fromarray(np.uint8(image_arr))
+
+
+def get_sum(array, size, i, j):
+    middle_brightness = 0
+    for x in range(i, i + size):
+        for y in range(j, j + size):
+            r = array[x][y][0]
+            g = array[x][y][1]
+            b = array[x][y][2]
+            brightness = r + g + b
+            middle_brightness += brightness
+    return middle_brightness
+
+
+def set_color(new_c, matrix, size, i, j):
+    for x in range(i, i + size):
+        for y in range(j, j + size):
+            for z in range(3):
+                matrix[x][y][z] = new_c
+
+
 img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a:
-    j = 0
-    while j < a1:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                r = arr[n][n1][0]
-                g = arr[n][n1][1]
-                b = arr[n][n1][2]
-                M = int(r + g + b) // 3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
+res = get_mosaic(img, size=15, gradation=5)
 res.save('res.jpg')

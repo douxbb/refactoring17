@@ -21,9 +21,10 @@ def make_mosaic(arr, m_h, m_w, grad):
         i = i + m_h
 
 
-arr_img = np.array(Image.open("img2.jpg"))
-size_h, size_w = input('Введите размер мозаики: ').split(',')
+images = input('Введите имя исходного файла и нового(через запятую): ').split(',')
+arr_img = np.array(Image.open(images[0] + ".jpg"))
+size_h, size_w = input('Введите размер мозаики(через запятую): ').split(',')
 num_grad = int(input('Введите число градации: '))
 make_mosaic(arr_img, int(size_h), int(size_w), num_grad)
 res = Image.fromarray(arr_img)
-res.save('res.jpg')
+res.save(images[1] + ".jpg")

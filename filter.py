@@ -1,12 +1,10 @@
 from PIL import Image
 import numpy as np
 class ConvertImage:
-
     def __init__(self, image, size, step):
         self.image = image
         self.size = size
         self.step = 255 // step
-
     def convert_image(self):
         height = len(self.image)
         width = len(self.image[1])
@@ -17,21 +15,10 @@ class ConvertImage:
         return Image.fromarray(self.image)
 
     def set_grayscale(self, medium_brightness, i, j):
-        for x in range(i, i + self.size):
-            for y in range(j, j + self.size):
-                self.image[x][y][0] = int(medium_brightness // self.step) * self.step / 3
-                self.image[x][y][1] = int(medium_brightness // self.step) * self.step / 3
-                self.image[x][y][2] = int(medium_brightness // self.step) * self.step / 3
+        self.image[i:i + self.size, j:j + self.size] = int(medium_brightness // self.step) * self.step / 3
 
     def get_medium_brightness(self, i, j):
-        medium_brightness = 0
-        for x in range(i, i + self.size):
-            for y in range(j, j + self.size):
-                pixel = self.image[x][y]
-                pixel_sum = pixel.sum()
-                medium_brightness += pixel_sum
-        medium_brightness = int(medium_brightness // self.size ** 2)
-        return medium_brightness
+        return int((self.image[i:i + self.size, j:j + self.size].sum()) // self.size ** 2)
 
 
 original_image = Image.open("img2.jpg")

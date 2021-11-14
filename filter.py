@@ -1,36 +1,25 @@
-from PIL import Image
-from numpy import *
 import numpy as np
+from PIL import Image
+
+
 class GreyImage:
     def __init__(self, pix_array, pix_size=10, gradation=5):
         self.image = np.array(pix_array)
-        self.size = pix_size
-        self.gradation = 255 // gradation
-        self.height = len(self.image)
-        self.width = len(self.image[0])
+        self.size = pix_size        
+        self.grad = 255 // gradation
+        self.width = len(self.image)
+        self.height = len(self.image[0])
 
-    def get_grey_image(self):
-        for px in range(0, self.width, self.size):
-            for y in range(0, self.height, self.size):
-                self.get_grey_color(color=self.get_middle_color(px, y), px=px, y=y)
-        return Image.fromarray(self.image)
-
-    def get_middle_color(self, px, y):
-        color = 0
-        for column in range(px, px + self.size):
-            for row in range(y, y + self.size):
-                color += sum([int(self.image[column][row][i]) for i in range(3)])
-        return int(color / 3 // (self.size ** 2))
-
-    def get_grey_color(self, color, px, y):
-        for column in range(
-            px, px + self.size):
-            for row in range(y, y + self.size):
-                self.image[column][row][0] = int(color // self.gradation) * self.gradation
-                self.image[column][row][1] = int(color // self.gradation) * self.gradation
-                self.image[column][row][2] = int(color // self.gradation) * self.gradation
+    def get_grey_image(self):        
+        for x in range(0, self.width, self.size):
+            for y in range(0, self.height, self.size):                
+                    self.image[x:x + self.size, y:y + self.size] = self.get_middle_color(x, y)
+        return Image.fromarray(self.image)    
+    def get_middle_color(self, x, y):
+        return int(self.image[x:x + self.size, y:y + self.size].sum() / 3 // self.size ** 2 // self.grad * self.grad)
 
 
-orig_image = Image.open("img2.jpg")
-result = GreyImage(pix_array=orig_image, pix_size=int(input()), gradation=int(input())).get_grey_image()
-result.save('res.jpg')
+
+orig_img = Image.open("img2.jpg")
+arr = GreyImage(orig_img, pix_size=int(input()), gradation=int(input())).get_grey_image()
+arr.save('res.jpg')

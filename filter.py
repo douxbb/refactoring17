@@ -1,28 +1,32 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+
+def get_mosaic(image, size, gradation):
+    image_arr = np.array(Image.open(image)).astype(int)
+    limit = 255 // gradation
+    image_len = len(image_arr)
+    image_h = len(image_arr[0])
+    i = 0
+    while i < image_len:
+        j = 0
+        while j < image_h:
+            segment = image_arr[i: i + size, j: j + size]
+            sum_c = np.sum(segment)
+            avg = int(sum_c // (size ** 2))
+            set_color(int(avg // limit) * limit / 3, image_arr, size, i, j)
+            j += size
+        i += size
+    return Image.fromarray(np.uint8(image_arr))
+
+
+def set_color(new_c, matrix, size, i, j):
+    for x in range(i, i + size):
+        for y in range(j, j + size):
+            for z in range(3):
+                matrix[x][y][z] = new_c
+
+
+get_mosaic(input("Введите имя файла изображения: "),
+           int(input("Введите размер мозаики: ")),
+           int(input("Введите размер градации: "))).save('res.jpg')

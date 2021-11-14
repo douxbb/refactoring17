@@ -25,14 +25,16 @@ def _load_image(input_image_path: str) -> np.ndarray:
     return np.array(img, dtype=np.uint8)
 
 
-def _get_and_validate_size(pixel_matrix: np.ndarray, segment_size: int) -> Tuple[int, int]:
+def _get_and_validate_size(
+    pixel_matrix: np.ndarray, segment_size: int
+) -> Tuple[int, int]:
     """
     Получение и валидация размеров матрицы пикселей
     """
     rows_count = len(pixel_matrix)
 
     if not rows_count:
-        raise ValidationError('Изображение пустое')
+        raise ValidationError("Изображение пустое")
 
     columns_count = len(pixel_matrix[0])
 
@@ -41,45 +43,43 @@ def _get_and_validate_size(pixel_matrix: np.ndarray, segment_size: int) -> Tuple
             f"Невозможно разделить изображение размером: ({rows_count}, "
             "{columns_count}) на сегменты размером: {segment_size}"
         )
-    
+
     return rows_count, columns_count
 
 
-def _calculate_mean_by_sector(pixel_matrix: np.ndarray, begin_corrdinates: Tuple[int, int], segment_size: int) -> int:
+def _calculate_mean_by_sector(
+    pixel_matrix: np.ndarray, begin_corrdinates: Tuple[int, int], segment_size: int
+) -> int:
     min_row_number, min_column_number = begin_corrdinates
-    mean_mosaic_segment_value = 0
-
-    for current_row_number in range(
-        min_row_number, min_row_number + segment_size
-    ):
-        for current_column_number in range(
-            min_column_number, min_column_number + segment_size
-        ):
-
-            red, green, blue = pixel_matrix[current_row_number][
-                current_column_number
-            ]
-            mean_rgb_value = (int(red) + int(green) + int(blue)) // 3
-            mean_mosaic_segment_value += mean_rgb_value
-
     return int(
-        mean_mosaic_segment_value // (segment_size ** 2)
+        pixel_matrix[
+            min_row_number : min_row_number + segment_size,
+            min_column_number : min_column_number + segment_size,
+        ].mean()
     )
 
 
-def _calculate_grayscale_gradation(mean_mosaic_segment_value: int, grayscale_gradation: int) -> int:
-    return int(mean_mosaic_segment_value // grayscale_gradation) * grayscale_gradation
+def _calculate_grayscale_gradation(
+    mean_mosaic_segment_value: int, grayscale_gradation: int
+) -> int:
+    if mean_mosaic_segment_value < grayscale_gradation:
+        return 0
+
+    return (mean_mosaic_segment_value // grayscale_gradation) * grayscale_gradation
 
 
-def _insert_grayscale_segment(pixel_matrix: np.ndarray, begin_corrdinates: Tuple[int, int], segment_size: int, grayscale_gradation_value: int) -> None:
+def _insert_grayscale_segment(
+    pixel_matrix: np.ndarray,
+    begin_corrdinates: Tuple[int, int],
+    segment_size: int,
+    grayscale_gradation_value: int,
+) -> None:
     min_row_number, min_column_number = begin_corrdinates
-    for current_row_number in range(
-        min_row_number, min_row_number + segment_size
-    ):
-        for current_column_number in range(
-            min_column_number, min_column_number + segment_size
-        ):
-            pixel_matrix[current_row_number][current_column_number][...] = grayscale_gradation_value
+    pixel_matrix[
+        min_row_number : min_row_number + segment_size,
+        min_column_number : min_column_number + segment_size,
+    ][...].fill(grayscale_gradation_value)
+
 
 def _create_pixel_art(
     input_image_path: str,
@@ -97,18 +97,25 @@ def _create_pixel_art(
         min_column_number = 0
 
         while min_column_number < columns_count:
-            mean_mosaic_segment_value = _calculate_mean_by_sector(pixel_matrix, (min_row_number, min_column_number), segment_size)
-            grayscale_gradation_value = _calculate_grayscale_gradation(mean_mosaic_segment_value, grayscale_gradation)
+            mean_mosaic_segment_value = _calculate_mean_by_sector(
+                pixel_matrix, (min_row_number, min_column_number), segment_size
+            )
+            grayscale_gradation_value = _calculate_grayscale_gradation(
+                mean_mosaic_segment_value, grayscale_gradation
+            )
 
             _insert_grayscale_segment(
-                pixel_matrix, (min_row_number, min_column_number), segment_size, grayscale_gradation_value
+                pixel_matrix,
+                (min_row_number, min_column_number),
+                segment_size,
+                grayscale_gradation_value,
             )
 
             min_column_number = min_column_number + segment_size
         min_row_number = min_row_number + segment_size
 
     _save_image(pixel_matrix, output_image_path)
- 
+
 
 def _parser() -> Namespace:
     parser = ArgumentParser(description="Преобразование изображения в пиксель арт")

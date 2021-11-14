@@ -11,18 +11,16 @@ def _create_pixel_art(input_image_path: str, output_image_path: str) -> None:
     a1 = len(arr[0])
     i = 0
 
-    while i < a - 11:
+    while i < a - 9:
         j = 0
-        while j < a1 - 11:
+        while j < a1 - 9:
             s = 0
             for n in range(i, i + 10):
                 for n1 in range(j, j + 10):
-                    n1 = arr[n][n1][0]
-                    n2 = arr[n][n1][1]
-                    n3 = arr[n][n1][2]
-                    M = n1 + n2 + n3
+                    red, green, blue = arr[n][n1]
+                    M = int(red) + int(green) + int(blue)
                     s += M
-            s = int(s // 100)
+            s = int(s // 300)
             for n in range(i, i + 10):
                 for n1 in range(j, j + 10):
                     arr[n][n1][0] = int(s // 50) * 50
@@ -30,6 +28,7 @@ def _create_pixel_art(input_image_path: str, output_image_path: str) -> None:
                     arr[n][n1][2] = int(s // 50) * 50
             j = j + 10
         i = i + 10
+    print(arr.dtype)
     res = Image.fromarray(arr)
     res.save(output_image_path)
 

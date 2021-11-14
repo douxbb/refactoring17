@@ -1,28 +1,35 @@
-from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+from PIL import Image
+class GreyImage:
+    def __init__(self, pix_array, pix_size=10, gradation=5):
+        self.image = np.array(pix_array)
+        self.size = pix_size
+        self.grad = 255 // gradation
+        self.width = len(self.image)
+        self.height = len(self.image[0])
+    def get_grey_image(self):
+        for x in range(0, self.width, self.size):
+            for y in range(0, self.height, self.size):
+                    self.image[x:x + self.size, y:y + self.size] = self.get_middle_color(x, y)
+        return Image.fromarray(self.image)
+    def get_middle_color(self, x, y):
+        return int(self.image[x:x + self.size, y:y + self.size].sum() / 3 // self.size ** 2 // self.grad * self.grad)
+flag = 'no'
+while flag == 'no':
+    print('Введите название картинки')
+    orig_img = Image.open('{}'.format(input()))
+    print('Выберите величину ячейки, на которую будут делить изображение\n' +
+          'Размер должен быть инициализирован целым положительным числом')
+    pic_size = int(input())
+    print('Выберите количество оттенков\n' +
+          'Количество должно быть инициализировано целым положительным числом')
+    grad = int(input())
+    arr = GreyImage(orig_img, pix_size=pic_size, gradation=grad).get_grey_image()
+    print('Введите название новой картинки')
+    name = input()
+    print('Введите формат новой картинки(jpg, png и т.д.)')
+    formt = input()
+    arr.save('{}.{}'.format(name, formt))
+    print('Если хотите завершить сессию, наберите \'yes\', если нет-нажмите enter')
+    if input() == 'yes':
+        flag = 'yes'

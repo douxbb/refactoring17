@@ -3,8 +3,8 @@ import numpy as np
 
 
 def get_mosaic(image, size, gradation):
+    image_arr = np.array(Image.open(image)).astype(int)
     limit = 255 // gradation
-    image_arr = np.array(image).astype(int)
     image_len = len(image_arr)
     image_h = len(image_arr[0])
     i = 0
@@ -27,6 +27,6 @@ def set_color(new_c, matrix, size, i, j):
                 matrix[x][y][z] = new_c
 
 
-img = Image.open("img2.jpg")
-res = get_mosaic(img, size=15, gradation=5)
-res.save('res.jpg')
+get_mosaic(input("Введите имя файла изображения: "),
+           int(input("Введите размер мозаики: ")),
+           int(input("Введите размер градации: "))).save('res.jpg')

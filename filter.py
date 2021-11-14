@@ -1,28 +1,40 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a:
-    j = 0
-    while j < a1:
-        s = 0
-        for n in range(i, i + 10):
-            for m in range(j, j + 10):
-                n1 = arr[n][m][0]
-                n2 = arr[n][m][1]
-                n3 = arr[n][m][2]
-                M = int(n1) + int(n2) + int(n3)
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for m in range(j, j + 10):
-                arr[n][m][0] = int(s // 50) * 50 / 3
-                arr[n][m][1] = int(s // 50) * 50 / 3
-                arr[n][m][2] = int(s // 50) * 50 / 3
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+class ConvertImage:
+
+    def __init__(self, image, size, step):
+        self.image = image
+        self.size = size
+        self.step = 255 // step
+
+    def convert_image(self):
+        height = len(self.image)
+        width = len(self.image[1])
+        for i in range(0, height, self.size):
+            for j in range(0, width, self.size):
+                medium_brightness = self.get_medium_brightness(i, j)
+                self.set_grayscale(medium_brightness, i, j)
+        return Image.fromarray(self.image)
+
+    def set_grayscale(self, medium_brightness, i, j):
+        for x in range(i, i + self.size):
+            for y in range(j, j + self.size):
+                self.image[x][y][0] = int(medium_brightness // self.step) * self.step / 3
+                self.image[x][y][1] = int(medium_brightness // self.step) * self.step / 3
+                self.image[x][y][2] = int(medium_brightness // self.step) * self.step / 3
+
+    def get_medium_brightness(self, i, j):
+        medium_brightness = 0
+        for x in range(i, i + self.size):
+            for y in range(j, j + self.size):
+                pixel = self.image[x][y]
+                pixel_sum = pixel.sum()
+                medium_brightness += pixel_sum
+        medium_brightness = int(medium_brightness // self.size ** 2)
+        return medium_brightness
+
+
+original_image = Image.open("img2.jpg")
+pixels = np.array(original_image)
+result = ConvertImage(pixels, 10, 50).convert_image()
+result.save('res.jpg')

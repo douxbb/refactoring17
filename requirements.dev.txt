@@ -1,0 +1,7 @@
+# formatters
+isort==5.10.1
+black==21.10b0
+
+# linters
+pylint==2.11.1
+mypy==0.910

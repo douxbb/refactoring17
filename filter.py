@@ -15,7 +15,9 @@ def mosaic_to_gray(array_img: np.array, mosiac_size, step_grad):
     return array_img
 
 
-square_size = 10
-gradation = 5
-Image.fromarray(mosaic_to_gray(np.array(Image.open("img2.jpg")), square_size, gradation)).save('res.jpg')
-
+img_name = input("Введите название файла для изменения: ")
+result_name = input("Введите название результирующего файла: ")
+square_size = int(input("Введите размер мозаики: "))
+gradation = int(input("Введите уровень градации серого: "))
+Image.fromarray(mosaic_to_gray(np.array(Image.open(img_name)), square_size, gradation)).save(result_name)
+print("Мозаика готова!")

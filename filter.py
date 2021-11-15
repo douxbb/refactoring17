@@ -19,7 +19,7 @@ def make_mosaic(array, grayscale:int, size_mosaic:int, row_length:int, column_le
         row_index += size_mosaic
     return array
 
-img_array = np.array(Image.open("img2.jpg"))
+img_array = np.array(Image.open(input("Полное имя файла:  ")))
 Image.fromarray(make_mosaic(img_array, int(input("Градации серого:  ")), 
                                     int(input("Размер мозайки:  ")), len(img_array),
                                     len(img_array[1]))).save('res.jpg')

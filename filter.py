@@ -9,8 +9,8 @@ def make_mosaic(array, grayscale:int, size_mosaic:int, row_length:int, column_le
         while column_index < column_length - (size_mosaic - 1):
             color = 0
             for step_row in range(row_index, row_index + size_mosaic):
-                color += map(lambda step_column: sum(map(int, array[step_row][step_column])) // 3,
-                        range(column_index, column_index + size_mosaic))
+                color += sum(map(lambda step_column: sum(map(int, array[step_row][step_column])) // 3,
+                        range(column_index, column_index + size_mosaic)))
             color = ((color // size_mosaic**2) // grayscale) * grayscale
             for step_row in range(row_index, row_index + size_mosaic):
                 for step_column in range(column_index, column_index + size_mosaic):

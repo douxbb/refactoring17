@@ -8,21 +8,15 @@ def get_image_brightness(rows, columns, img_array, mosaic_size) -> int:
             for c_index in range(columns, columns + mosaic_size) 
             for r_index in range(rows, rows + mosaic_size))
 
-def create_img_bit(rows, columns, mosaic_size, brightness, img_array) -> None:
-    for r_index in range(rows, rows + mosaic_size):
-        for c_index in range(columns, columns + mosaic_size):
-            img_array[r_index][c_index] = np.full(3, brightness)
+def create_img_bit(rows, columns, mosaic_size, brightness, img_array) -> list:
+    img_array[rows: rows + mosaic_size, columns: columns + mosaic_size] = np.full(3, brightness)
     return img_array
 
 def create_image(img_array, rows_length, columns_length, mosaic_size, grayscale):
-    rows = 0
-    while rows < rows_length:
-        columns = 0
-        while columns < columns_length:
+    for rows in range(0, rows_length, mosaic_size):
+        for columns in range(0, columns_length, mosaic_size):
             create_img_bit(rows, columns, mosaic_size, get_image_brightness(rows, columns, img_array, mosaic_size) // mosaic_size**2 // grayscale*grayscale,
-                        img_array)
-            columns += mosaic_size
-        rows += mosaic_size
+                    img_array)
     return img_array
 
 img_array = np.array(Image.open(input('Введите имя изображения в директории: ') + ".jpg"))

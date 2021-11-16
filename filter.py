@@ -1,25 +1,17 @@
 from PIL import Image
 import numpy as np
+
+
 def set_color(arr, i, j, cell_size, brightness, graduation):
-    for row in range(i, i + cell_size):
-        for column in range(j, j + cell_size):
-            value = int(brightness // graduation) * graduation
-            arr[row][column][0] = value
-            arr[row][column][1] = value
-            arr[row][column][2] = value
+    value = int(brightness // graduation) * graduation
+    arr[i: i + cell_size, j: j + cell_size] = value
     return arr
 
 
 def get_avg_brightness(arr, i, j, cell_size):
-    result = 0
-    for row in range(i, i + cell_size):
-        for column in range(j, j + cell_size):
-            r = arr[row][column][0]
-            g = arr[row][column][1]
-            b = arr[row][column][2]
-            sum = int(r) + int(g) + int(b)
-            result += sum
-    result = int(result // 3 // (cell_size ** 2))
+    interval = arr[i: i + cell_size, j: j + cell_size]
+    summa = np.sum(interval)
+    result = int(summa // 3 // (cell_size ** 2))
     return result
 
 

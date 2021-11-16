@@ -2,27 +2,25 @@ from PIL import Image
 import numpy as np
 img = Image.open("img2.jpg")
 arr = np.array(img)
-a = len(arr)
-a1 = len(arr[1])
-i = 0
-while i < a - 11:
-    j = 0
-    while j < a1 - 11:
-        s = 0
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                n1 = arr[n][n1][0]
-                n2 = arr[n][n1][1]
-                n3 = arr[n][n1][2]
-                M = n1 + n2 + n3
-                s += M
-        s = int(s // 100)
-        for n in range(i, i + 10):
-            for n1 in range(j, j + 10):
-                arr[n][n1][0] = int(s // 50) * 50
-                arr[n][n1][1] = int(s // 50) * 50
-                arr[n][n1][2] = int(s // 50) * 50
-        j = j + 10
-    i = i + 10
+width = len(arr)
+height = len(arr[1])
+cell_size = 10;
+step = 50;
+for i in range(0, width - cell_size + 1, cell_size):
+    for j in range(0, height - cell_size + 1, cell_size):
+        avg_brightness = 0
+        for row in range(i, i + cell_size):
+            for column in range(j, j + cell_size):
+                r = arr[row][column][0]
+                g = arr[row][column][1]
+                b = arr[row][column][2]
+                sum = int(r) + int(g) + int(b)
+                avg_brightness += sum
+        avg_brightness = int(avg_brightness // 3 // (cell_size ** 2))
+        for row in range(i, i + cell_size):
+            for column in range(j, j + cell_size):
+                arr[row][column][0] = int(avg_brightness // step) * step
+                arr[row][column][1] = int(avg_brightness // step) * step
+                arr[row][column][2] = int(avg_brightness // step) * step
 res = Image.fromarray(arr)
 res.save('res.jpg')

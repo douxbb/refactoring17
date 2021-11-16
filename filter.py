@@ -8,36 +8,31 @@ class PixelArt:
         self.file_path = file_path
         self.chunk_size = chunk_size
         self.color_step = color_step
-        image = Image.open(file_path)
-        self.array = np.array(image)
-        self.result = np.array(image)
-        self.x_len = len(self.array)
-        self.y_len = len(self.array[1])
+        self.array = np.array(Image.open(file_path))
 
     def generate_art(self):
-        for x in range(0, self.x_len, self.chunk_size):
-            for y in range(0, self.y_len, self.chunk_size):
-                chunk_color = [(int(sum([sum([sum(map(int, self.array[n][n1])) / 3
-                                              for n1 in range(y, y + (self.chunk_size
-                                                                      if self.y_len - y >= self.chunk_size
-                                                                      else self.y_len - y))])
-                                         for n in range(x, x + (self.chunk_size
-                                                                if self.x_len - x >= self.chunk_size
-                                                                else self.x_len - x))]) // 100) // self.color_step)
-                               * self.color_step for _ in range(3)]
-                for m in range(x, x + (self.chunk_size if self.x_len - x >= self.chunk_size else self.x_len - x)):
-                    for m1 in range(y, y + (self.chunk_size if self.y_len - y >= self.chunk_size else self.y_len - y)):
-                        self.result[m][m1] = chunk_color
+        x_len = len(self.array)
+        y_len = len(self.array[1])
+        for x in range(0, x_len, self.chunk_size):
+            for y in range(0, y_len, self.chunk_size):
+                chunk_size_x = self.chunk_size if x_len - x >= self.chunk_size else x_len - x
+                chunk_size_y = self.chunk_size if y_len - y >= self.chunk_size else y_len - y
+                chunk = self.get_chuck_color(x, y, chunk_size_x, chunk_size_y)
+                for m in range(x, x + chunk_size_x):
+                    for m1 in range(y, y + chunk_size_y):
+                        self.array[m][m1] = chunk
+        return self
+
+    def get_chuck_color(self, x, y, chunk_size_x, chunk_size_y):
+        color = (np.sum(self.array[x: x + chunk_size_x, y: y + chunk_size_y]) / 3 / self.chunk_size ** 2)
+        return color - color % (255 / self.color_step)
 
     def save(self):
-        result = Image.fromarray(self.result)
-        result.save(self.save_path)
+        Image.fromarray(self.array).save(self.save_path)
 
 
 if __name__ == '__main__':
-    art = PixelArt(int(input('Enter chunk size: ')),
-                   255 // int(input('Enter count of colors: ')),
-                   input('Enter original file path: '),
-                   input('Enter result file path: '))
-    art.generate_art()
-    art.save()
+    PixelArt(int(input('Enter chunk size: ')),
+             int(input('Enter count of colors: ')),
+             input('Enter original file path: '),
+             input('Enter result file path: ')).generate_art().save()

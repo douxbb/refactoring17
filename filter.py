@@ -1,28 +1,19 @@
 from PIL import Image
 import numpy as np
-img = Image.open("img2.jpg")
-arr = np.array(img)
-width = len(arr)
-height = len(arr[1])
-i = 0
-while i < width:
-    j = 0
-    while j < height:
-        middle = 0
-        for x in range(i, i + 10):
-            for y in range(j, j + 10):
-                r = int(arr[x][y][0])
-                g = int(arr[x][y][1])
-                b = int(arr[x][y][2])
-                brightness = int(r + g + b)//3
-                middle += brightness
-        middle = int(middle // 100)
-        for x in range(i, i + 10):
-            for r in range(j, j + 10):
-                arr[x][r][0] = int(middle // 50) * 50
-                arr[x][r][1] = int(middle // 50) * 50
-                arr[x][r][2] = int(middle // 50) * 50
-        j = j + 10
-    i = i + 10
-res = Image.fromarray(arr)
-res.save('res.jpg')
+
+def mosaic_to_gray(array, mosiac_size, gradation):
+    width = len(array)
+    height = len(array[1])
+    for x in range(0, width, mosiac_size):
+        for y in range(0,height, mosiac_size):
+            pixel = array[x:x + mosiac_size, y:y + mosiac_size]
+            medium_color = (np.sum(pixel)/3) // (mosiac_size * mosiac_size)
+            
+            for i in range(x, x + mosiac_size):
+                for j in range(y, y + mosiac_size):
+                    array[i][j].fill((medium_color // (gradation*10))*(gradation*10))
+    return array
+
+img_name, result_name= input("Название изменяемого файла: "), input("Название результирующего файла: ")
+mosiac_size, gradation = int(input("Размер мозаики: ")), int(input("Уровень градации: "))
+Image.fromarray(mosaic_to_gray(np.array(Image.open(img_name)), mosiac_size, gradation)).save(result_name)

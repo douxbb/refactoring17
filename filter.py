@@ -2,11 +2,7 @@ from PIL import Image
 import numpy as np
 
 def get_image_brightness(rows, columns, img_array, mosaic_size) -> int:
-    return sum((int(img_array[r_index][c_index][0]) 
-            + int(img_array[r_index][c_index][1]) 
-            + int(img_array[r_index][c_index][2])) // 3 
-            for c_index in range(columns, columns + mosaic_size) 
-            for r_index in range(rows, rows + mosaic_size))
+    return int(np.sum(img_array[rows: rows + mosaic_size, columns: columns + mosaic_size]) // 3 // (mosaic_size ** 2))
 
 def create_img_bit(rows, columns, mosaic_size, brightness, img_array) -> list:
     img_array[rows: rows + mosaic_size, columns: columns + mosaic_size] = np.full(3, brightness)
@@ -15,7 +11,7 @@ def create_img_bit(rows, columns, mosaic_size, brightness, img_array) -> list:
 def create_image(img_array, rows_length, columns_length, mosaic_size, grayscale):
     for rows in range(0, rows_length, mosaic_size):
         for columns in range(0, columns_length, mosaic_size):
-            create_img_bit(rows, columns, mosaic_size, get_image_brightness(rows, columns, img_array, mosaic_size) // mosaic_size**2 // grayscale*grayscale,
+            create_img_bit(rows, columns, mosaic_size, get_image_brightness(rows, columns, img_array, mosaic_size) // grayscale*grayscale,
                     img_array)
     return img_array
 
